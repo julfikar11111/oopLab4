@@ -1,0 +1,93 @@
+#include <iostream>
+#include <vector>
+
+
+class Vehicle {
+protected:
+    std::string vehicleID;
+    float fuelCapacity;
+    int maxSpeed;
+
+public:
+    Vehicle(std::string id, float fuel, int speed) : vehicleID(id), fuelCapacity(fuel), maxSpeed(speed) {}
+
+    virtual void move() = 0;  // Pure virtual function
+    virtual void displayInfo() = 0; // Pure virtual function
+
+    
+};
+
+// Insurance Class for Multiple Inheritance
+class Insurance {
+protected:
+    bool insured;
+    float insuranceAmount;
+
+public:
+    Insurance(){}
+    Insurance(bool isInsured, float amount) : insured(isInsured), insuranceAmount(amount) {}
+
+    void displayInsuranceInfo() {
+        std::cout << "Insured: " << (insured ? "Yes" : "No") << ", Insurance Amount: $" << insuranceAmount << std::endl;
+    }
+};
+
+
+class Car : public Vehicle, public Insurance {
+private:
+    int passengers;
+
+public:
+    Car(){}
+    Car(std::string id, float fuel, int speed, int passengerCount, bool isInsured, float amount) 
+        : Vehicle(id, fuel, speed), Insurance(isInsured, amount), passengers(passengerCount) {}
+
+    void move() override {
+        std::cout << "Car is moving at " << maxSpeed - 60 << " km/h.\n";
+    }
+
+    void displayInfo() override {
+        std::cout << "Vehicle ID: " << vehicleID << "\n";
+        std::cout << "Vehicle Type: Car\n";
+        std::cout << "Max Speed: " << maxSpeed << " km/h\n";
+        std::cout << "Fuel Capacity: " << fuelCapacity << " liters\n";
+        std::cout << "Passenger Capacity: " << passengers << "\n";
+        displayInsuranceInfo();
+    }
+
+    
+    void loadPassengers(int numPassengers) {
+        std::cout << "Loading " << numPassengers << " passengers into the car.\n";
+    }
+
+    void loadPassengers(std::string cargoType) {
+        std::cout << "Loading cargo: " << cargoType << " into the car.\n";
+    }
+
+    
+    Car operator+(const Car& other) {
+        return Car("CombinedCar", fuelCapacity + other.fuelCapacity, 
+                   std::max(maxSpeed, other.maxSpeed), passengers, insured, insuranceAmount);
+    }
+};
+
+int main() {
+    Car car1("001", 50, 180, 4, true, 10000);
+    Car car2("002", 45, 160, 5, false, 5000);
+
+    Vehicle* vehicles[] = { &car1, &car2 };
+
+    
+    for (Vehicle* v : vehicles) {
+        v->move();
+        v->displayInfo();
+        std::cout << "---------------------------\n";
+    }
+
+    
+    Car car3 = car1 + car2;
+    std::cout << "Combined Car Info:\n";
+    car3.displayInfo();
+
+    return 0;
+}
